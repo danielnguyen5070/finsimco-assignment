@@ -24,6 +24,12 @@ export default function FinancialAnalysis() {
     const [selectedCompanyName, setSelectedCompanyName] = useState("TBD")
     const [selectedDescription, setSelectedDescription] = useState("TBD")
 
+    function getButtonStyle(isSelected: boolean, isTBD: boolean = false) {
+        return `${isTBD ? "rounded-r-none" : "rounded-l-none"} py-5 ${isSelected ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`
+    }
+
+    const style_input = "bg-gray-800 border-gray-700 py-5 mr-5"
+
     return (
         <div className="min-h-screen bg-black text-white flex flex-col">
             {/* Header */}
@@ -58,9 +64,9 @@ export default function FinancialAnalysis() {
 
                     {/* Main Form */}
                     <div className="flex-1 bg-gray-900 rounded-lg p-8">
-                        <div>
+                        <div className="mb-4">
                             <Select>
-                                <SelectTrigger className="w-full bg-gray-800 border-gray-700">
+                                <SelectTrigger className="w-full bg-gray-800 border-gray-700 py-5">
                                     <SelectValue placeholder="Select Location" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -70,9 +76,9 @@ export default function FinancialAnalysis() {
                             </Select>
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block mb-2">
+                                    <label className="block mb-1">
                                         EBITDA <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -80,18 +86,18 @@ export default function FinancialAnalysis() {
                                             <Input
                                                 value={ebitda}
                                                 onChange={(e) => setEbitda(e.target.value)}
-                                                className="bg-gray-800 border-gray-700"
+                                                className={`${style_input}`}
                                             />
                                         </div>
                                         <div className="flex">
                                             <Button
-                                                className={`rounded-r-none ${selectedEbitda === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
+                                                className={getButtonStyle(selectedEbitda === "TBD", true)}
                                                 onClick={() => setSelectedEbitda("TBD")}
                                             >
                                                 TBD
                                             </Button>
                                             <Button
-                                                className={`rounded-l-none ${selectedEbitda === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
+                                                className={getButtonStyle(selectedEbitda === "OK", false)}
                                                 onClick={() => setSelectedEbitda("OK")}
                                             >
                                                 OK
@@ -101,7 +107,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2">
+                                    <label className="block mb-1">
                                         Interest Rate <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -109,19 +115,19 @@ export default function FinancialAnalysis() {
                                             <Input
                                                 value={interestRate}
                                                 onChange={(e) => setInterestRate(e.target.value)}
-                                                className="bg-gray-800 border-gray-700"
+                                                className={`${style_input}`}
                                             />
 
                                         </div>
                                         <div className="flex">
                                             <Button
-                                                className={`${selectedInterestRate === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
+                                                className={getButtonStyle(selectedInterestRate === "TBD", true)}
                                                 onClick={() => setSelectedInterestRate("TBD")}
                                             >
                                                 TBD
                                             </Button>
                                             <Button
-                                                className={`rounded-l-none ${selectedInterestRate === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
+                                                className={getButtonStyle(selectedInterestRate === "OK", false)}
                                                 onClick={() => setSelectedInterestRate("OK")}
                                             >
                                                 OK
@@ -131,7 +137,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2">
+                                    <label className="block mb-1">
                                         Multiple <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -139,18 +145,18 @@ export default function FinancialAnalysis() {
                                             <Input
                                                 value={multiple}
                                                 onChange={(e) => setMultiple(e.target.value)}
-                                                className="bg-gray-800 border-gray-700"
+                                                className={`${style_input}`}
                                             />
                                         </div>
                                         <div className="flex">
                                             <Button
-                                                className={`rounded-r-none ${selectedMultiple === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
+                                                className={getButtonStyle(selectedMultiple === "TBD", true)}
                                                 onClick={() => setSelectedMultiple("TBD")}
                                             >
                                                 TBD
                                             </Button>
                                             <Button
-                                                className={`rounded-l-none ${selectedMultiple === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
+                                                className={getButtonStyle(selectedMultiple === "OK", false)}
                                                 onClick={() => setSelectedMultiple("OK")}
                                             >
                                                 OK
@@ -160,59 +166,64 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2">
+                                    <label className="block mb-1">
                                         Factor Score <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="mb-2">
-                                        <Slider
-                                            value={[factorScore]}
-                                            onValueChange={(value) => setFactorScore(value[0])}
-                                            max={100}
-                                            step={1}
-                                            className="py-4"
-                                        />
-                                    </div>
-                                    <div className="flex justify-between text-xs text-gray-500 mb-2">
-                                        <span>0</span>
-                                        <span>100</span>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <div className="flex">
-                                            <Button
-                                                className={`rounded-r-none ${selectedFactorScore === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
-                                                onClick={() => setSelectedFactorScore("TBD")}
-                                            >
-                                                TBD
-                                            </Button>
-                                            <Button
-                                                className={`rounded-l-none ${selectedFactorScore === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
-                                                onClick={() => setSelectedFactorScore("OK")}
-                                            >
-                                                OK
-                                            </Button>
+                                    <div className="flex space-x-2 items-center justify-between">
+                                        <div className="w-full">
+                                            <div className="mb-2">
+                                                <Slider
+                                                    value={[factorScore]}
+                                                    onValueChange={(value) => setFactorScore(value[0])}
+                                                    max={100}
+                                                    step={1}
+                                                    className="py-4"
+                                                />
+                                            </div>
+                                            <div className="flex justify-between text-xs text-gray-500 mb-2">
+                                                <span>0</span>
+                                                <span>100</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-end">
+                                            <div className="flex">
+                                                <Button
+                                                    className={getButtonStyle(selectedFactorScore === "TBD", true)}
+                                                    onClick={() => setSelectedFactorScore("TBD")}
+                                                >
+                                                    TBD
+                                                </Button>
+                                                <Button
+                                                    className={getButtonStyle(selectedFactorScore === "OK", false)}
+                                                    onClick={() => setSelectedFactorScore("OK")}
+                                                >
+                                                    OK
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2">
+                                    <label className="block mb-1">
                                         Company Name <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
                                         <Input
                                             value={companyName}
                                             onChange={(e) => setCompanyName(e.target.value)}
-                                            className="flex-1 bg-gray-800 border-gray-700"
+                                            className={`${style_input}`}
                                         />
                                         <div className="flex">
                                             <Button
-                                                className={`rounded-r-none ${selectedCompanyName === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
+                                                className={getButtonStyle(selectedCompanyName === "TBD", true)}
                                                 onClick={() => setSelectedCompanyName("TBD")}
                                             >
                                                 TBD
                                             </Button>
                                             <Button
-                                                className={`rounded-l-none ${selectedCompanyName === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
+                                                className={getButtonStyle(selectedCompanyName === "OK", false)}
                                                 onClick={() => setSelectedCompanyName("OK")}
                                             >
                                                 OK
@@ -222,23 +233,23 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2">Description</label>
+                                    <label className="block mb-1">Description</label>
                                     <div className="flex space-x-2">
                                         <Textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            className="bg-gray-800 border-gray-700 h-24"
+                                            className={`h-24 ${style_input}`}
                                         />
                                         <div className="flex justify-end">
                                             <div className="flex">
                                                 <Button
-                                                    className={`rounded-r-none ${selectedDescription === "TBD" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
+                                                    className={getButtonStyle(selectedDescription === "TBD", true)}
                                                     onClick={() => setSelectedDescription("TBD")}
                                                 >
                                                     TBD
                                                 </Button>
                                                 <Button
-                                                    className={`rounded-l-none ${selectedDescription === "OK" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-700/50 hover:bg-gray-600/50 text-white/70"}`}
+                                                    className={getButtonStyle(selectedDescription === "OK", false)}
                                                     onClick={() => setSelectedDescription("OK")}
                                                 >
                                                     OK
@@ -260,7 +271,7 @@ export default function FinancialAnalysis() {
                         </div>
 
                         <div className="mt-8">
-                            <Button className="w-full py-6 text-lg bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500">
+                            <Button className="w-full py-5 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500">
                                 SUBMIT
                             </Button>
                         </div>
