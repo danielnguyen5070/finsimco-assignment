@@ -1,12 +1,22 @@
 "use client"
 
-import { useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
+import { useState, useEffect } from "react"
+import DiscreteSlider from "@/components/DiscreteSlider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Camera, Search } from "lucide-react"
+import svg_camera from "@/assets/camera.svg"
+import svg_doc from "@/assets/document.svg"
+import PieChart from "@/components/PieChart"
+import FloatingAccordion from "@/components/FloatingAccordion"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function FinancialAnalysis() {
     const [ebitda, setEbitda] = useState("10")
@@ -23,23 +33,43 @@ export default function FinancialAnalysis() {
     const [selectedFactorScore, setSelectedFactorScore] = useState("TBD")
     const [selectedCompanyName, setSelectedCompanyName] = useState("TBD")
     const [selectedDescription, setSelectedDescription] = useState("TBD")
+    const [timeLeft, setTimeLeft] = useState(1259); // 20:59 in seconds
+
+    const EBITDA = 1000;
+    const valuation = EBITDA * multiple * factorScore;
+    const team1Share = valuation * 0.6;
+    const team2Share = valuation * 0.4;
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer); // Cleanup on unmount
+    }, []);
+
+    const formatTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    };
 
     function getButtonStyle(isSelected: boolean, isTBD: boolean = false) {
         return `${isTBD ? "rounded-r-none" : "rounded-l-none"} py-5 ${isSelected ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`
     }
-
     const style_input = "bg-gray-800 border-gray-700 py-5 mr-5"
-
+    const guidanceText =
+        "Welcome to the negotiation simulation! In this exercise, your team will input financial terms such as EBITDA, Multiple, and Interest Rate. These inputs will dynamically determine the valuation and visual representation in the pie chart. Be sure to collaborate, review each term carefully, and aim for a fair outcome. This guidance appears only once to help you get started confidently. Good luck, and negotiate wisely!";
     return (
         <div className="min-h-screen bg-black text-white flex flex-col">
             {/* Header */}
             <div className="border-b border-gray-800">
                 <header className="max-w-7xl m-auto py-4 flex justify-between items-between">
                     <div className="flex items-center">
-                        <span className="text-5xl text-orange-500">20:59</span>
+                        <span className="text-5xl text-orange-500 w-32">{formatTime(timeLeft)}</span>
                         <div className="ml-4">
-                            <div className="text-sm">Stage : ANALYSIS</div>
-                            <div className="text-sm">Next : STRUCTURING - 60 mins</div>
+                            <div className="text-sm text-gray-300">Stage : ANALYSIS</div>
+                            <div className="text-sm text-gray-400">Next : STRUCTURING - 60 mins</div>
                         </div>
                     </div>
                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-500 font-bold">
@@ -49,36 +79,65 @@ export default function FinancialAnalysis() {
             </div>
 
             {/* Main Content */}
-            <div className="mt-4">
+            <div className="mt-7">
                 <div className="max-w-5xl m-auto flex flex">
                     {/* Sidebar */}
-                    <div className="w-16 rounded-md flex flex-col items-center space-y-8">
+                    <div className="w-16 rounded-md flex flex-col items-center space-y-8 mr-6">
                         <div className="rounded-md">
-                            <Camera className="text-orange-500 w-8 h-8" />
+                            {/* import svg from "@/assets/logo.svg" */}
+                            <Dialog>
+                                <DialogTrigger>
+                                    <img src={svg_camera} alt="Logo" className="w-12 h-12" />
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-7xl bg-black border-0 text-white rounded-lg shadow-lg">
+                                    <DialogHeader>
+                                        <DialogTitle></DialogTitle>
+                                        <DialogDescription>
+                                            <div className="aspect-video w-full mt-2">
+                                                <iframe
+                                                    className="w-full h-full rounded-md"
+                                                    src="https://www.youtube.com/embed/lA8uv9tDLJI"
+                                                    title="Simulation Guidance Video"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                />
+                                            </div>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         </div>
-                        <div className="h-px w-8 bg-gray-700" />
-                        <div className="p-2">
-                            <Search className="text-gray-400 w-8 h-8" />
+                        <div className="h-px w-14 bg-gray-700 opacity-65" />
+                        <div className="">
+                            <Dialog>
+                                <DialogTrigger>
+                                    <img src={svg_doc} alt="Logo" className="w-12 h-12" />
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-xl bg-gray-900 border-0 text-white rounded-lg shadow-lg">
+                                    <DialogHeader>
+                                        <DialogTitle></DialogTitle>
+                                        <DialogDescription>
+                                            <p className="text-gray-300 mt-2">{guidanceText}</p>
+                                            <p className="text-gray-300 mt-2">{guidanceText}</p>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
 
                     {/* Main Form */}
                     <div className="flex-1 bg-gray-900 rounded-lg p-8">
-                        <div className="mb-4">
-                            <Select>
-                                <SelectTrigger className="w-full bg-gray-800 border-gray-700 py-5">
-                                    <SelectValue placeholder="Select Location" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="location1">Location 1</SelectItem>
-                                    <SelectItem value="location2">Location 2</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <div className="mb-4 w-full">
+                            <FloatingAccordion
+                                title="First Time Guidance"
+                                content={guidanceText}
+                            />
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block mb-1">
+                                    <label className="block mb-2 text-sm">
                                         EBITDA <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -107,7 +166,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
+                                    <label className="block mb-2 text-sm">
                                         Interest Rate <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -137,7 +196,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
+                                    <label className="block mb-2 text-sm">
                                         Multiple <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -166,24 +225,12 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
+                                    <label className="block mb-2 text-sm">
                                         Factor Score <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex space-x-2 items-center justify-between">
-                                        <div className="w-full">
-                                            <div className="mb-2">
-                                                <Slider
-                                                    value={[factorScore]}
-                                                    onValueChange={(value) => setFactorScore(value[0])}
-                                                    max={100}
-                                                    step={1}
-                                                    className="py-4"
-                                                />
-                                            </div>
-                                            <div className="flex justify-between text-xs text-gray-500 mb-2">
-                                                <span>0</span>
-                                                <span>100</span>
-                                            </div>
+                                    <div className="flex space-x-2">
+                                        <div className="flex-1 flex mr-7">
+                                            <DiscreteSlider min={1} max={5} step={1} label="Interest Rate (%)" onChange={(v) => setFactorScore(v)} />
                                         </div>
 
                                         <div className="flex justify-end">
@@ -206,14 +253,14 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
+                                    <label className="block mb-2 text-sm">
                                         Company Name <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
                                         <Input
                                             value={companyName}
                                             onChange={(e) => setCompanyName(e.target.value)}
-                                            className={`${style_input}`}
+                                            className={`${style_input} mr-7`}
                                         />
                                         <div className="flex">
                                             <Button
@@ -233,12 +280,12 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">Description</label>
+                                    <label className="block mb-2 text-sm">Description</label>
                                     <div className="flex space-x-2">
                                         <Textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            className={`h-24 ${style_input}`}
+                                            className={`h-24 ${style_input} mr-7 pt-2`}
                                         />
                                         <div className="flex justify-end">
                                             <div className="flex">
@@ -261,11 +308,13 @@ export default function FinancialAnalysis() {
                             </div>
 
                             <div className="flex flex-col items-center justify-center">
-                                <div className="text-5xl font-bold text-orange-500 mb-2">$ 200 million</div>
-                                <div className="text-gray-400 mb-8">Valuation</div>
+                                <div>
+                                    <div className="text-5xl font-medium text-orange-500 mb-2">$ 200 million</div>
+                                    <div className="text-gray-400 mb-8 italic text-sm">Valuation</div>
+                                </div>
 
-                                <div className="w-64 h-64 relative">
-                                    <PieChart />
+                                <div className="w-72 h-72 relative">
+                                    <PieChart team1Share={team1Share} team2Share={team2Share} />
                                 </div>
                             </div>
                         </div>
@@ -279,32 +328,5 @@ export default function FinancialAnalysis() {
                 </div>
             </div>
         </div>
-    )
-}
-
-function PieChart() {
-    return (
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="transparent"
-                stroke="#1e40af"
-                strokeWidth="80"
-                strokeDasharray="251.2 0"
-                transform="rotate(-90 50 50)"
-            />
-            <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="transparent"
-                stroke="#3b82f6"
-                strokeWidth="80"
-                strokeDasharray="175.8 251.2"
-                transform="rotate(-90 50 50)"
-            />
-        </svg>
     )
 }
