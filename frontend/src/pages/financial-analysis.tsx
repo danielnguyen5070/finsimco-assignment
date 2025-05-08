@@ -25,7 +25,12 @@ export default function FinancialAnalysis() {
     const [factorScore, setFactorScore] = useState(50)
     const [companyName, setCompanyName] = useState("Rodgers Chayuga")
     const [description, setDescription] = useState("Launch your development career with project-based coaching")
+    const [isOpen, setIsOpen] = useState(false);
 
+    const handleLogout = () => {
+        console.log("User signed out");
+        // Add your actual sign-out logic here
+    };
     // Toggle button states
     const [selectedEbitda, setSelectedEbitda] = useState("TBD")
     const [selectedInterestRate, setSelectedInterestRate] = useState("TBD")
@@ -36,7 +41,7 @@ export default function FinancialAnalysis() {
     const [timeLeft, setTimeLeft] = useState(1259); // 20:59 in seconds
 
     const EBITDA = 1000;
-    const valuation = EBITDA * multiple * factorScore;
+    const valuation = EBITDA * parseInt(multiple) * factorScore;
     const team1Share = valuation * 0.6;
     const team2Share = valuation * 0.4;
 
@@ -57,7 +62,7 @@ export default function FinancialAnalysis() {
     function getButtonStyle(isSelected: boolean, isTBD: boolean = false) {
         return `${isTBD ? "rounded-r-none" : "rounded-l-none"} py-5 ${isSelected ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-700 hover:bg-gray-600 text-white"}`
     }
-    const style_input = "bg-gray-800 border-gray-700 py-5 mr-5"
+    const style_input = "bg-gray-800 border-gray-700 py-5 "
     const guidanceText =
         "Welcome to the negotiation simulation! In this exercise, your team will input financial terms such as EBITDA, Multiple, and Interest Rate. These inputs will dynamically determine the valuation and visual representation in the pie chart. Be sure to collaborate, review each term carefully, and aim for a fair outcome. This guidance appears only once to help you get started confidently. Good luck, and negotiate wisely!";
     return (
@@ -72,8 +77,26 @@ export default function FinancialAnalysis() {
                             <div className="text-sm text-gray-400">Next : STRUCTURING - 60 mins</div>
                         </div>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-500 font-bold">
-                        JS
+                    {/* Dropdown menu */}
+                    <div
+                        className="relative"
+                        onMouseEnter={() => setIsOpen(true)}
+                        onMouseLeave={() => setIsOpen(false)}
+                    >
+                        <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-500 font-bold">
+                            JS
+                        </button>
+
+                        {isOpen && (
+                            <div className="p-4 absolute right-0 mt-2 w-40 bg-gray-800 rounded shadow-lg z-10">
+                                <Button
+                                    onClick={handleLogout}
+                                    className="block w-full text-left px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-sm"
+                                >
+                                    Log out
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </header>
             </div>
@@ -83,7 +106,7 @@ export default function FinancialAnalysis() {
                 <div className="max-w-5xl m-auto flex flex">
                     {/* Sidebar */}
                     <div className="w-16 rounded-md flex flex-col items-center space-y-8 mr-6">
-                        <div className="rounded-md">
+                        <div className="rounded-md mt-2">
                             {/* import svg from "@/assets/logo.svg" */}
                             <Dialog>
                                 <DialogTrigger>
@@ -137,16 +160,21 @@ export default function FinancialAnalysis() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block mb-2 text-sm">
+                                    <label className="block mb-2 text-sm text-gray-300">
                                         EBITDA <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
                                         <div className="flex-1 flex">
-                                            <Input
-                                                value={ebitda}
-                                                onChange={(e) => setEbitda(e.target.value)}
-                                                className={`${style_input}`}
-                                            />
+                                            <div className="relative w-full mr-5">
+                                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">$</span>
+                                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">million</span>
+                                                <Input
+                                                    value={ebitda}
+                                                    onChange={(e) => setEbitda(e.target.value)}
+                                                    className={`pr-16 pl-6 ${style_input}`}
+                                                />
+                                            </div>
+
                                         </div>
                                         <div className="flex">
                                             <Button
@@ -166,17 +194,19 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2 text-sm">
+                                    <label className="block mb-2 text-sm text-gray-300">
                                         Interest Rate <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
                                         <div className="flex-1 flex">
-                                            <Input
-                                                value={interestRate}
-                                                onChange={(e) => setInterestRate(e.target.value)}
-                                                className={`${style_input}`}
-                                            />
-
+                                            <div className="relative w-full mr-5">
+                                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">%</span>
+                                                <Input
+                                                    value={interestRate}
+                                                    onChange={(e) => setInterestRate(e.target.value)}
+                                                    className={`${style_input}`}
+                                                />
+                                            </div>
                                         </div>
                                         <div className="flex">
                                             <Button
@@ -196,16 +226,19 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2 text-sm">
+                                    <label className="block mb-2 text-sm text-gray-300">
                                         Multiple <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
                                         <div className="flex-1 flex">
-                                            <Input
-                                                value={multiple}
-                                                onChange={(e) => setMultiple(e.target.value)}
-                                                className={`${style_input}`}
-                                            />
+                                            <div className="relative w-full mr-5">
+                                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">x</span>
+                                                <Input
+                                                    value={multiple}
+                                                    onChange={(e) => setMultiple(e.target.value)}
+                                                    className={`${style_input}`}
+                                                />
+                                            </div>
                                         </div>
                                         <div className="flex">
                                             <Button
@@ -225,7 +258,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2 text-sm">
+                                    <label className="block mb-2 text-sm text-gray-300">
                                         Factor Score <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -253,7 +286,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2 text-sm">
+                                    <label className="block mb-2 text-sm text-gray-300">
                                         Company Name <span className="text-red-500">*</span>
                                     </label>
                                     <div className="flex space-x-2">
@@ -280,7 +313,7 @@ export default function FinancialAnalysis() {
                                 </div>
 
                                 <div>
-                                    <label className="block mb-2 text-sm">Description</label>
+                                    <label className="block mb-2 text-sm text-gray-300">Description</label>
                                     <div className="flex space-x-2">
                                         <Textarea
                                             value={description}
