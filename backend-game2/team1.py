@@ -2,7 +2,7 @@ import asyncio
 import asyncpg
 import aioconsole
 from config import DB_URL
-from db import print_update, upsert_simulations, connect_listener, listen_for_updates, update_simulation_by_id
+from db import print_update, upsert_simulations, connect_listener, listen_for_updates, update_bid_masters_by_id_1
 
 TEAM_NAME = "Team1"
 async def main():
@@ -13,10 +13,10 @@ async def main():
     listen_conn = await connect_listener()  # Connect to listener for real-time updates
     
     # Listen for updates from other teams
-    await listen_for_updates(listen_conn, TEAM_NAME, lambda v, a: print_update(pool, v, a))
+    await listen_for_updates(listen_conn, TEAM_NAME, lambda : print_update(pool, TEAM_NAME))
     try:
         while True:
-            await print_update(pool, '', False)  # Print the current state of the table
+            await print_update(pool, TEAM_NAME)  # Print the current state of the table
 
             id_input = await aioconsole.ainput("")
 
@@ -25,8 +25,17 @@ async def main():
 
             try:
                 id_selected = int(id_input)
-                new_value_input = await aioconsole.ainput(f"New value for ID {id_selected} > ")
-                await update_simulation_by_id(pool, id_selected, new_value_input)
+                new_value_input = await aioconsole.ainput(f"New price, share for ID {id_selected} > ")
+
+                new_values = new_value_input.split(",")
+                if len(new_values) != 2:
+                    print("----------- Invalid input. Please enter both 'price' and 'share' in the format 'price, share'.")
+                    await asyncio.sleep(1)
+                    continue
+                new_price = new_values[0].strip()
+                new_share = new_values[1].strip()
+
+                await update_bid_masters_by_id_1(pool, id_selected, new_price, new_share)
             except ValueError:
                 print("----------- Invalid input. Please enter a valid number.")
                 await asyncio.sleep(1)
