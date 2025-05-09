@@ -1,6 +1,7 @@
 import asyncpg
 import asyncio
-from config import DB_URL, DB_URL_STRING
+from config import DB_URL
+from utils import render_table, calculate_valuation
 
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS simulation (
@@ -43,14 +44,13 @@ async def init_database():
     finally:
         await conn.close()
 
-
 CHANNEL = "simulation_channel"
 
 async def create_pool():
-    return await asyncpg.create_pool(DB_URL_STRING)
+    return await asyncpg.create_pool(**DB_URL)
 
 async def connect_listener():
-    return await asyncpg.connect(DB_URL_STRING)
+    return await asyncpg.connect(**DB_URL)
 
 async def update_simulation_by_id(pool, id, value):
     query = "UPDATE simulation SET value = $1 WHERE id = $2"
@@ -64,5 +64,43 @@ async def listen_for_updates(conn, team_name: str, callback_fn):
         asyncio.create_task(callback_fn(value, approved))  # Wrap in task
     await conn.add_listener(CHANNEL, _callback)
 
+async def fetch_simulation_rows(conn):
+    return await conn.fetch("SELECT id, term, value, unit, approved FROM simulation ORDER BY id")
+
+async def upsert_simulations(pool):
+    query = """
+    INSERT INTO simulation (term, value, unit)
+    VALUES 
+        ('EBITDA', NULL, '$'),
+        ('Interest Rate', NULL, '%'),
+        ('Multiple', NULL, 'x'),
+        ('Factor Score', NULL, '#')
+    ON CONFLICT (term) DO UPDATE SET
+        value = NULL;
+    """
+    async with pool.acquire() as conn:
+        await conn.execute(query)
+
+async def update_simulation_by_id(pool, id, value):
+    query = "UPDATE simulation SET value = $1, approved = FALSE WHERE id = $2"
+    async with pool.acquire() as conn:
+        await conn.execute(query, value, int(id))
+
+async def print_update(pool, value, approved):
+    async with pool.acquire() as conn:
+        rows = await fetch_simulation_rows(conn)
+        table_text = render_table(rows)
+        valuation = calculate_valuation(rows)
+
+        print("\033c", end="")  # Clear screen
+        print(table_text)
+        print(f"\n- Valuation: {valuation:,.2f}")
+        print("-  Type the ID of the row you want to edit or 'exit' to quit.\n")
+
+async def update_simulation_approval(pool, id, approved):
+    query = "UPDATE simulation SET approved = $1 WHERE id = $2"
+    async with pool.acquire() as conn:
+        await conn.execute(query, approved, int(id))
+        
 if __name__ == "__main__":
     asyncio.run(init_database())
