@@ -20,18 +20,12 @@ import {
 
 export default function FinancialAnalysis() {
     const [ebitda, setEbitda] = useState("10")
-    const [interestRate, setInterestRate] = useState("20")
+    const [interestRate, setInterestRate] = useState(20)
     const [multiple, setMultiple] = useState("10")
-    const [factorScore, setFactorScore] = useState(50)
+    const [factorScore, setFactorScore] = useState(1)
     const [companyName, setCompanyName] = useState("Rodgers Chayuga")
     const [description, setDescription] = useState("Launch your development career with project-based coaching")
     const [isOpen, setIsOpen] = useState(false);
-
-    const handleLogout = () => {
-        console.log("User signed out");
-        // Add your actual sign-out logic here
-    };
-    // Toggle button states
     const [selectedEbitda, setSelectedEbitda] = useState("TBD")
     const [selectedInterestRate, setSelectedInterestRate] = useState("TBD")
     const [selectedMultiple, setSelectedMultiple] = useState("TBD")
@@ -40,10 +34,9 @@ export default function FinancialAnalysis() {
     const [selectedDescription, setSelectedDescription] = useState("TBD")
     const [timeLeft, setTimeLeft] = useState(1259); // 20:59 in seconds
 
-    const EBITDA = 1000;
-    const valuation = EBITDA * parseInt(multiple) * factorScore;
-    const team1Share = valuation * 0.6;
-    const team2Share = valuation * 0.4;
+    const total = 100;
+    const team1Share = interestRate;
+    const team2Share = total - interestRate;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -52,6 +45,19 @@ export default function FinancialAnalysis() {
 
         return () => clearInterval(timer); // Cleanup on unmount
     }, []);
+
+
+    const handleLogout = () => {
+        console.log("User signed out");
+        // Add your actual sign-out logic here
+    };
+
+    const getValuation = () => {
+        const ebitdaValue = parseInt(ebitda) || 0;
+        const multipleValue = parseInt(multiple) || 0;
+
+        return Math.round(ebitdaValue * multipleValue * factorScore);
+    }
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
@@ -166,12 +172,12 @@ export default function FinancialAnalysis() {
                                     <div className="flex space-x-2">
                                         <div className="flex-1 flex">
                                             <div className="relative w-full mr-5">
-                                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">$</span>
+                                                <span className="ml-1 absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">$</span>
                                                 <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">million</span>
                                                 <Input
                                                     value={ebitda}
                                                     onChange={(e) => setEbitda(e.target.value)}
-                                                    className={`pr-16 pl-6 ${style_input}`}
+                                                    className={`pr-16 pl-7 ${style_input}`}
                                                 />
                                             </div>
 
@@ -203,7 +209,7 @@ export default function FinancialAnalysis() {
                                                 <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">%</span>
                                                 <Input
                                                     value={interestRate}
-                                                    onChange={(e) => setInterestRate(e.target.value)}
+                                                    onChange={(e) => setInterestRate(parseInt(e.target.value))}
                                                     className={`${style_input}`}
                                                 />
                                             </div>
@@ -342,7 +348,7 @@ export default function FinancialAnalysis() {
 
                             <div className="flex flex-col items-center justify-center">
                                 <div>
-                                    <div className="text-5xl font-medium text-orange-500 mb-2">$ 200 million</div>
+                                    <div className="text-5xl font-medium text-orange-500 mb-2">$ {getValuation()} million</div>
                                     <div className="text-gray-400 mb-8 italic text-sm">Valuation</div>
                                 </div>
 

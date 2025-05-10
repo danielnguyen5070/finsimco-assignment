@@ -23,7 +23,7 @@ const PieChart: React.FC<PieChartProps> = ({ team1Share, team2Share }) => {
         datasets: [
             {
                 data: [team1Share, team2Share],
-                backgroundColor: ['#979797', '#147AD6'],
+                backgroundColor: ['#147AD6', '#979797'],
                 borderWidth: 0,
             },
         ],
