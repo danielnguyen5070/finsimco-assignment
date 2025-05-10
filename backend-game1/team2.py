@@ -12,16 +12,16 @@ async def main():
     listen_conn = await connect_listener()
 
     # Listen to simulation_channel notifications
-    await listen_for_updates(listen_conn, TEAM_NAME, lambda : asyncio.create_task(print_update(pool, TEAM_NAME)))
-
+    await listen_for_updates(listen_conn, TEAM_NAME, lambda: print_update(pool, TEAM_NAME))
+    
     try:
         while True:
-            await print_update(pool, TEAM_NAME)  # Print the current state of the table
-            
             if await check_all_approved(pool):
                 print("-------> All values approved")
                 break
 
+            await print_update(pool, TEAM_NAME)  # Print the current state of the table
+            
             id_input = await aioconsole.ainput("")
             if id_input.strip().lower() == "exit":
                 break
