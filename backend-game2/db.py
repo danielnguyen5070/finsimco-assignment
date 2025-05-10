@@ -1,7 +1,6 @@
 import asyncpg
 import asyncio
 from config import DB_URL
-from utils import render_table, calculate_shares_bid_for, extract_investor_bids, extract_prices, calculate_capital_raised, return_subscription, extract_available_shares
 
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS bid_masters (
@@ -97,26 +96,6 @@ async def upsert_simulations(pool):
     async with pool.acquire() as conn:
         await conn.execute(query)
 
-async def print_update(pool, team_name: str = None):
-    async with pool.acquire() as conn:
-        rows = await fetch_simulation_rows(conn)
-        table_text = render_table(rows)
-
-        investor_bids = extract_investor_bids(rows)
-        prices = extract_prices(rows)
-        available_shares = extract_available_shares(rows)
-
-        shares_bid_for = calculate_shares_bid_for(investor_bids)
-        capital_raised = calculate_capital_raised(shares_bid_for, prices)
-        subscription = return_subscription(shares_bid_for, available_shares)
-
-        print("\033c", end="")  # Clear screen
-        print(team_name)
-        print(table_text)
-        print(f"- Shares Bid For: {shares_bid_for}")
-        print(f"- Capital Raised: {capital_raised}")
-        print(f"- Subscription: {subscription}")
-        print("\nType the ID of the row you want to edit or 'exit' to quit.\n")
-        
+    
 if __name__ == "__main__":
     asyncio.run(init_database())

@@ -2,7 +2,8 @@ import asyncio
 import asyncpg
 import aioconsole
 from config import DB_URL
-from db import print_update, upsert_simulations, connect_listener, listen_for_updates, update_bid_masters_by_id_2
+from db import upsert_simulations, connect_listener, listen_for_updates, update_bid_masters_by_id_2
+from utils import print_update
 
 TEAM_NAME = "Team2"
 async def main():
@@ -29,8 +30,8 @@ async def main():
 
                 new_values = new_value_input.split(",")
                 if len(new_values) != 3:
-                    print("----------- Invalid input. Please enter both 'price' and 'share' in the format 'price, share'.")
-                    await asyncio.sleep(1)
+                    print("----------- Invalid input. Please enter format 'invester1, invester2, invester3'.")
+                    await asyncio.sleep(5)
                     continue
                 new_invester_1 = new_values[0].strip()
                 new_invester_2 = new_values[1].strip()

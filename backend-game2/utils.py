@@ -1,4 +1,5 @@
 from tabulate import tabulate
+from db import fetch_simulation_rows
 
 def extract_investor_bids(rows):
     investor_bids = {
@@ -61,3 +62,25 @@ def return_subscription(shares_bid_for, available_shares):
 def render_table(rows):
     table = [(r['id'], r['company'], r['price'], r['share'], r['invester1'], r['invester2'], r['invester3']) for r in rows]
     return tabulate(table, headers=["ID", "Companny", "Price", "Share", "Invester1", "Invester2", "Invester3"])
+
+async def print_update(pool, team_name: str = None):
+    async with pool.acquire() as conn:
+        rows = await fetch_simulation_rows(conn)
+        table_text = render_table(rows)
+
+        investor_bids = extract_investor_bids(rows)
+        prices = extract_prices(rows)
+        available_shares = extract_available_shares(rows)
+
+        shares_bid_for = calculate_shares_bid_for(investor_bids)
+        capital_raised = calculate_capital_raised(shares_bid_for, prices)
+        subscription = return_subscription(shares_bid_for, available_shares)
+
+        print("\033c", end="")  # Clear screen
+        print(team_name)
+        print(table_text)
+        print(f"- Shares Bid For: {shares_bid_for}")
+        print(f"- Capital Raised: {capital_raised}")
+        print(f"- Subscription: {subscription}")
+        print("\nType the ID of the row you want to edit or 'exit' to quit.\n")
+    
