@@ -2,7 +2,8 @@ import asyncio
 import asyncpg
 import aioconsole
 from config import DB_URL
-from db import print_update, upsert_simulations, connect_listener, listen_for_updates, update_simulation_by_id
+from db import upsert_simulations, connect_listener, listen_for_updates, update_simulation_by_id, check_all_approved
+from utils import print_update
 
 TEAM_NAME = "Team1"
 async def main():
@@ -13,10 +14,14 @@ async def main():
     listen_conn = await connect_listener()  # Connect to listener for real-time updates
     
     # Listen for updates from other teams
-    await listen_for_updates(listen_conn, TEAM_NAME, lambda v, a: print_update(pool, v, a))
+    await listen_for_updates(listen_conn, TEAM_NAME, lambda : print_update(pool, TEAM_NAME))
     try:
         while True:
-            await print_update(pool, '', False)  # Print the current state of the table
+            await print_update(pool, TEAM_NAME)  # Print the current state of the table
+
+            if await check_all_approved(pool):
+                print("-------> All values approved")
+                break
 
             id_input = await aioconsole.ainput("")
 

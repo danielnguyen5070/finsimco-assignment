@@ -1,9 +1,9 @@
 import asyncio
 import asyncpg
 import aioconsole
-from tabulate import tabulate
 from config import DB_URL
-from db import print_update, connect_listener, listen_for_updates, update_simulation_approval
+from db import connect_listener, listen_for_updates, update_simulation_approval, check_all_approved
+from utils import print_update
 
 TEAM_NAME = "Team2"
 async def main():
@@ -12,11 +12,15 @@ async def main():
     listen_conn = await connect_listener()
 
     # Listen to simulation_channel notifications
-    await listen_for_updates(listen_conn, TEAM_NAME, lambda v, a: asyncio.create_task(print_update(pool, v, a)))
+    await listen_for_updates(listen_conn, TEAM_NAME, lambda : asyncio.create_task(print_update(pool, TEAM_NAME)))
 
     try:
         while True:
-            await print_update(pool, '', False)  # Print the current state of the table
+            await print_update(pool, TEAM_NAME)  # Print the current state of the table
+            
+            if await check_all_approved(pool):
+                print("-------> All values approved")
+                break
 
             id_input = await aioconsole.ainput("")
             if id_input.strip().lower() == "exit":
